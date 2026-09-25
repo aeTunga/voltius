@@ -34,7 +34,7 @@ import { vaultOptionsFrom } from "@/hooks/useVaultOptions";
 import { usePortForwardingStore } from "@/stores/portForwardingStore";
 import { useTransferQueueStore } from "@/stores/transferQueueStore";
 import { useHostPingStore } from "@/stores/hostPingStore";
-import { getSyncState, onSyncStateChange, getExcludedObjectIds, getPluginSkippedSyncFiles, writeFilteredSettings, decryptBlob, forEachRemoteBlob, mergeBlobPayload, importMergedPayload, type BlobPayload } from "@/services/sync";
+import { getSyncState, onSyncStateChange, getExcludedObjectIds, getPluginSkippedSyncFiles, writeFilteredSettings, openRemoteBlob, forEachRemoteBlob, mergeBlobPayload, importMergedPayload, type BlobPayload } from "@/services/sync";
 import { useThemeStore } from "@/stores/themeStore";
 import { useSyncPrefsStore } from "@/stores/syncPrefsStore";
 import type {
@@ -2334,7 +2334,7 @@ function createPluginAPI(manifest: PluginManifest): PluginAPI {
           const blobBytes: number[] = Array.from(
             Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)),
           );
-          const remote = await decryptBlob([encKeyBytes], blobBytes);
+          const remote = await openRemoteBlob([encKeyBytes], blobBytes);
           merged = mergeBlobPayload(merged, remote);
           readable++;
 
