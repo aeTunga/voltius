@@ -54,11 +54,8 @@ export const appSettingsHandler: UserDataHandler = {
       const style = d.terminal.cursorStyle;
       if (style && CURSOR_STYLES.includes(style)) s.setCursorStyle(style);
     }
-    if (d.plugins?.overrides) {
-      const overrides = d.plugins.overrides;
-      usePluginRegistryStore.setState({ overrides });
-      await invoke("plugin_registry_save", { overrides }).catch(() => {});
-    }
+    const overrides = d.plugins?.overrides;
+    if (overrides) usePluginRegistryStore.setState({ overrides });
     if (d.toggles) {
       const { set } = useToggleSettingsStore.getState();
       for (const [id, value] of Object.entries(d.toggles)) {
@@ -71,6 +68,8 @@ export const appSettingsHandler: UserDataHandler = {
     if (d.locale && SUPPORTED_LOCALES.some((l) => l.value === d.locale)) {
       useLocaleStore.getState().setLocale(d.locale);
     }
+    // Last, after every store write (see UserDataHandler.import).
+    if (overrides) await invoke("plugin_registry_save", { overrides }).catch(() => {});
   },
 
   merge: lastWriteWins,
